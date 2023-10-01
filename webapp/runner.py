@@ -15,9 +15,18 @@ import os
 from werkzeug.middleware.proxy_fix import ProxyFix
 from datetime import timedelta
 import json
+from dotenv import dotenv_values
+from base64 import b64encode
+from Crypto.Hash import SHA256
+from Crypto.Protocol.KDF import bcrypt,bcrypt_check
+
+
+app_config = dotenv_values(".env")
+mongodb_url = f"mongodb+srv://app_config['MONGODB_USER']:{app_config['MONGODB_PASS']}@sih2023.lomtnfw.mongodb.net/?retryWrites=true&w=majority"
 
 app = Flask(__name__, static_url_path="", static_folder="static")
-app.secret_key = ""  # os.environ["FLASK_SECRET_KEY"]
+
+app.secret_key = app_config["FLASK_SECRET_KEY"]
 app.permanent_session_lifetime = timedelta(weeks=1)
 app.config.update(
     SESSION_COOKIE_SECURE=True,
@@ -28,6 +37,7 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_host=1)
 
 
 # -------------- ERROR HANDLERS ---------------
+'''
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template("404.html"), 404
@@ -36,7 +46,7 @@ def page_not_found(e):
 @app.errorhandler(CSRFError)
 def handle_csrf_error(e):
     return render_template("csrf_error.html"), 400
-
+'''
 
 # -------------- URL ROUTERS -----------------
 @app.route("/")

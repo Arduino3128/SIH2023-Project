@@ -12,7 +12,11 @@ def run():
                 "gunicorn",
                 "runner:app",
                 "--bind",
-                "0.0.0.0:80",
+                "0.0.0.0:443",
+		"--certfile",
+		"/etc/letsencrypt/live/barelyafloat.cloudns.nz/fullchain.pem",
+		"--keyfile",
+                "/etc/letsencrypt/live/barelyafloat.cloudns.nz/privkey.pem",
                 "--worker-class",
                 "gevent",
             ]
