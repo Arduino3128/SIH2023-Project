@@ -1,0 +1,16 @@
+<!doctype html>
+<html>
+<head></head>
+<body>
+ <form action="/dashboard/register_device" method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+  <label for="FarmID">Farm ID:</label><br>
+  <input type="text" id="farmid" name="FarmID" placeholder="Farm ID" required><br>
+  <label for="Location">Location:</label><br>
+  <input type="text" id="location" name="Location" placeholder="0.0,0.0" required><br><br>
+  <label for="RegisterString">QRCODE DATA:</label><br>
+  <input type="text" id="RegisterString" name="RegisterString" placeholder="RegisterString" required><br>
+  <input type="submit" value="Submit">
+</form> 
+</body>
+</html>

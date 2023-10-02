@@ -1,0 +1,70 @@
+from pymongo import MongoClient
+from base64 import b64encode
+import bcrypt
+
+class Database():
+	def __init__(self,):
+		pass
+	def connect(self,connectionString,dbName,colName):
+		self.client = MongoClient(connectionString)
+		self.database = self.client[dbName]
+		self.collection = self.database[colName]
+
+	def verify_user(self,username,password):
+		_userinfo = self.collection.find_one({"UserInfo.Username": username})
+		if _userinfo:
+			_password = _userinfo["UserInfo"]["Password"]
+			if (bcrypt.checkpw(password.encode(), _password.encode())):
+				return True
+			else:
+				return False
+		return False
+
+	def register_user(self,username,password):
+		if not self.check_user(username):
+			try:
+				_hashed_pwd = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+				_document = {"UserAsset":{},"UserInfo":{"Username":username,"Password":_hashed_pwd.decode()}}
+				self.collection.insert_one(_document)
+				return True
+			except:
+				return False
+		return False
+
+	def check_user(self,username):
+		_userinfo = self.collection.find_one({"UserInfo.Username": username})
+		if _userinfo:
+			return True
+		return False
+
+	def update_probe(self,query,data):
+		try:
+			_result = self.collection.update_one(query, data)
+			if _result.modified_count > 0:
+				return True
+			return False
+		except:
+			return False
+
+	def fetch_probe(self,username,password):
+		try:
+			if (self.verify_user(username,password)):
+				_userinfo = self.collection.find_one({"UserInfo.Username": username})
+				if _userinfo:
+					return _userinfo["UserAsset"]
+			return {}
+		except:
+			return {}
+
+
+	def register_device(self, username, password, farm_id, device_id, mac_id, location):
+		try:
+			if (self.verify_user(username,password)):
+				data = {"$set": {f"UserAsset.{farm_id}.ProbeModule.{device_id}":{"Location":location,"MACID":mac_id,"Humidity":0.0,"Temperature":0.0,"SWI":0.0}}}
+				query = {"UserInfo.Username":username}
+				_result = self.collection.update_one(query, data)
+			if _result.modified_count > 0:
+				return True
+			return False
+		except:
+			return False
