@@ -68,20 +68,23 @@ def home():
 
 @app.route("/dashboard/register_device",methods=["GET","POST"])
 def register_device():
-	if request.method == "POST":
-		try:
-			r_str = json.loads(request.form.get('RegisterString'))
-			farm_id = request.form.get("FarmID") #get based on location?
-			location = request.form.get("Location")
-			_status = DB.register_device(session.get('Username'),session.get('Password'),farm_id,r_str.get('DEVICE ID'),r_str.get('DEVICE MAC'),location)
-			if _status:
-				return "OK"
-			return "FAIL"
-		except:
-			return "FAIL"
-	else:
-		return render_template("register_device.html")
+	if session.get('Username'):
+		if DB.verify_user(session.get('Username'),session.get('Password')):
+			if request.method == "POST":
+				try:
+					r_str = json.loads(request.form.get('RegisterString'))
+					farm_id = request.form.get("FarmID") #get based on location?
+					location = request.form.get("Location")
+					_status = DB.register_device(session.get('Username'),session.get('Password'),farm_id,r_str.get('DEVICE ID'),r_str.get('DEVICE MAC'),location)
+					if _status:
+						return "OK"
+					return "FAIL"
+				except:
+					return "FAIL"
+			else:
+				return render_template("register_device.html")
 
+	return redirect("/login")
 
 @app.route("/register",methods=["GET","POST"])
 def register():
