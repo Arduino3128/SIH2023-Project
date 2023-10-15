@@ -1,0 +1,11 @@
+modules = ["python-3.10:v18-20230807-322e88b"]
+
+hidden = [".pythonlibs"]
+run = "cd ~/SIH2023-Project/webapp && python runner.py"
+
+[nix]
+channel = "stable-23_05"
+
+[deployment]
+run = ["sh", "-c", "cd ~/SIH2023-Project/webapp && python runner.py"]
+deploymentTarget = "cloudrun"

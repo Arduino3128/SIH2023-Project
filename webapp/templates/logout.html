@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<body>
+   <h2>Logged Out!</h2>
+   <p><b>The page will redirect to home page in 5 seconds.</p>
+   <script>
+      function myURL() {
+         document.location.href = '/';
+         clearInterval(interval);
+      }
+	  
+	   function redirect () {
+			var interval = setInterval(myURL, 5000);
+	  }
+	  redirect();
+   </script>
+</body>
+</html>

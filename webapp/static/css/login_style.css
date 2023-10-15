@@ -1,0 +1,100 @@
+* {
+    margin: 0;
+}
+
+html,
+body {
+    max-width: 100%;
+    overflow-x: hidden;
+    background-image: url('/images/login_background.jpeg');
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+}
+
+.main-container {
+    height: 100%;
+    width: 100%;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    position: absolute;
+    background: linear-gradient(to bottom, transparent 0%, black 200%);
+}
+
+.login-container {
+    position: absolute;
+    right: 0;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+    height: 50%;
+    width: 75%;
+    border: 1px solid transparent;
+    border-radius: 15px;
+    background-color: rgba(255, 255, 255, 0.25);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+
+.login-form {
+    position: absolute;
+    margin: auto;
+    text-align: center;
+    height: 75%;
+    width: 100%;
+    top: 0;
+    bottom: 0;
+}
+
+.login-form input[type="submit"] {
+    margin-top: 30px;
+    border: 1px solid black;
+    border-radius: 20px;
+    background-color: #53B340;
+    height: 5vh;
+    width: 20vw;
+    color: white;
+}
+
+.login-form input[type="submit"]:active {
+   	background-color: #38772b;
+}
+
+.login-form input[type="submit"]:hover {
+   	background-color: #4aa237;
+}
+
+.login-form input[type="text"],
+input[type="password"] {
+    width: 90%;
+    height: 5vh;
+    border: 1px solid black;
+    border-radius: 15px;
+    padding-left: 10px;
+    margin-top: 20px;
+}
+
+.login-form img {
+    height: 30%;
+}
+
+@media(min-width:756px){
+.login-container {
+	position: absolute;
+	right: 0;
+	left: 0;
+	top: 0;
+	bottom: 0;
+	margin: auto;
+	height: 50%;
+	width: 30%;
+	border: 1px solid transparent;
+	border-radius: 15px;
+	background-color: rgba(255, 255, 255, 0.25);
+	-webkit-backdrop-filter: blur(10px);
+	backdrop-filter: blur(10px);
+}
+}

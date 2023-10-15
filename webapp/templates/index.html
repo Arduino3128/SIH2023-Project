@@ -3,8 +3,30 @@
 
 <head>
 	<title>Barely Afloat - 2023</title>
-	<link rel="icon" type="image/png" href="/logo.png" />
+	<link rel="icon" type="image/png" href="/images/logo.png" />
+	
+	<!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-PFHQ43RCK8"></script>
+	<script>
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
+	
+	  gtag('config', 'G-PFHQ43RCK8');
+	</script>
+
 	<style>
+	* {
+	    @import url('https://fonts.googleapis.com/css?family=Ubuntu');
+	    margin: 0;
+	}
+	
+	html,
+	body {
+	    font-family: 'Ubuntu', sans-serif;
+	    max-width: 100%;
+	    overflow-x: hidden;
+	}
 	.center_align {
 		position: absolute;
 		top: 0;
@@ -16,12 +38,25 @@
 		width: 500px;
 		text-align: center;
 	}
+		
+	.header{
+		height: 10%
+	}
+	
+	.header button{
+		position: absolute;
+		right: 0;
+		margin: 10px;
+		padding:10px;
+	}
+			
 	</style>
 </head>
 
 <body>
+	<div class="header"><button onclick="document.location='/login'">Login</button></div>
 	<div class="center_align">
-	    <img src="/logo.png" width="200px"></img>
+	    <img src="/images/logo.png" width="200px"></img>
 	    <h1>Coming Soon...</h1>
 	    <h1>Barely Afloat</h1>
 	    To know more <a href='https://www.youtube.com/watch?v=dQw4w9WgXcQ&pp=ygUJcmljayByb2xs' target="_blank">click here</a>

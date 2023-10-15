@@ -1,0 +1,126 @@
+* {
+    margin: 0;
+}
+
+html,
+body {
+    max-width: 100%;
+    overflow-x: hidden;
+    background-image: url('/images/login_background.jpeg');
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+}
+
+.main-container {
+    height: 100%;
+    width: 100%;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    position: absolute;
+    background: linear-gradient(to bottom, transparent 0%, black 200%);
+}
+
+.find-container {
+    position: absolute;
+    right: 0;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+    height: 50%;
+    width: 75%;
+    border: 1px solid transparent;
+    border-radius: 15px;
+    background-color: rgba(255, 255, 255, 0.25);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+
+.find-form {
+    position: absolute;
+    margin: auto;
+    text-align: center;
+    height: 75%;
+    width: 100%;
+    top: 0;
+    bottom: 0;
+}
+
+.find-form img {
+	height: 100%;
+}
+.find-form .center-logo {
+	height: 30%;
+}
+
+.find-form li{
+	height:25%;
+}
+
+.find-form ul {
+	list-style-type: none;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	right: 0;
+	left: 0;
+	margin: auto;
+	text-align: center;
+	padding: 0px;
+}
+
+@media(min-width:756px){
+.find-container {
+	position: absolute;
+	right: 0;
+	left: 0;
+	top: 0;
+	bottom: 0;
+	margin: auto;
+	height: 50%;
+	width: 30%;
+	border: 1px solid transparent;
+	border-radius: 15px;
+	background-color: rgba(255, 255, 255, 0.25);
+	-webkit-backdrop-filter: blur(10px);
+	backdrop-filter: blur(10px);
+}
+}
+
+.header {
+	height: 10%;
+	width:100%;
+	z-index: 1;
+	position: absolute;
+}
+
+.header button{
+	position: absolute;
+	left: 0;
+	margin: 10px;
+	padding:10px;
+	border:1px solid transparent;
+	border-radius: 15px;
+}
+
+.header button:hover {
+	cursor: pointer;
+}
+
+#compass {
+	transform: rotateZ(0deg);
+	margin-top: -30px;
+	height: 150%;
+}
+
+#device-info{
+	font-size:small;
+	margin-top:10px;
+}
+
+#pose{
+	padding-top:40px;
+}
