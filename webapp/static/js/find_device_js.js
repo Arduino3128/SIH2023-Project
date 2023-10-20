@@ -18,13 +18,6 @@ async function getGeolocation() {
 	});
 }
 
-var device_lat = 0;
-var device_lon = 0;
-const queryString = window.location.search;
-const urlParams = new URLSearchParams(queryString);
-var farm_id = urlParams.get('farm_id');
-var device_id = urlParams.get('device_id');
-
 function write_status(text,color="#000000"){
 	var _status = document.getElementById("pose");
 	_status.innerHTML = text;
@@ -53,11 +46,34 @@ async function getLocationAndOrientationEverySecond() {
 			var orientation = await getDeviceOrientation();
 			var bearing = calculateInitialBearing(device_lat,device_lon,geolocation.lat,geolocation.lng)
 			var distance = calculateDistance(geolocation.lat,geolocation.lng,device_lat,device_lon)
-			var compass_val = orientation-bearing
-			write_status(`Distance: ${distance.toFixed(2)}m<br>Angle: ${compass_val.toFixed(2 )}deg`);
-			document.getElementById("compass").style.transform=`rotate(${compass_val.toFixed(2)}deg)`
-			// You can do something with the geolocation and orientation data here
-		}, 50); // Fetch data every second (100 milliseconds)
+			var turnAngle = (bearing-orientation);
+			if (turnAngle>360){
+				turnAngle = turnAngle-360;
+			}
+			write_status(`Distance: ${distance.toFixed(2)}m<br>Angle: ${turnAngle.toFixed(2)}deg`);
+			map.setCenter([geolocation.lng,geolocation.lat]);
+			if (isBoot){
+				map.setZoom(17);
+				isBoot = false;
+			}
+			map.setBearing(turnAngle);
+			my_location_obj.setLngLat(map.getCenter()).setPopup(
+				new mapboxgl.Popup({ offset: 25 })
+				  .setHTML(
+					`<h3><b>You</b></h3><p>Location: ${geolocation.lat}, ${geolocation.lng}</p>`
+				  )
+			  )
+			  .addTo(map);
+			my_location_obj.getElement().style.display = null;
+			device_location_obj.setLngLat([device_lon,device_lat]).setPopup(
+				new mapboxgl.Popup({ offset: 25 })
+				  .setHTML(
+					`<h3>Device ID: ${device_id}</h3><p>Location: ${device_lat}, ${device_lon}</p>`
+				  )
+			  )
+			  .addTo(map);
+			device_location_obj.getElement().style.display = null;
+			}, 50); // Fetch data every second (100 milliseconds)
 	} catch (error) {
 		console.error("Error:", error);
 	}
@@ -82,8 +98,6 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 	return distance*1000;
 }
 
-
-// Function to calculate the initial bearing between two coordinates
 function calculateInitialBearing(lat1, lon1, lat2, lon2) {
 	// Convert latitude and longitude from degrees to radians
 	lat1 = toRadians(lat1);
@@ -128,7 +142,7 @@ async function get_location(){
 			getLocationAndOrientationEverySecond();
 		}
 		else{
-			write_status(`Distance: --m<br>Angle: --deg`);
+			write_status(`Distance: -- m<br>Angle: -- deg`);
 			deviceInfoElement.innerHTML = `Could not locate the device!`;
 			deviceInfoElement.style.color = "#FF0000";
 		}
@@ -143,29 +157,78 @@ async function get_location(){
 function get_device(farm_id, device_id) {
   return new Promise(async (resolve, reject) => {
 	try {
-	  const response = await fetch('/dashboard/find_device', {
-		headers: {
-		  'Accept': 'application/json',
-		  'Content-Type': 'application/json'
-		},
+		
+		const formData = new FormData(document.getElementById('data_form'));
+		const formDataString = new URLSearchParams(formData).toString();
+		const response = await fetch('/dashboard/find_device', {
+		  headers: {
+			'Content-Type': 'application/x-www-form-urlencoded'
+		  },
 		credentials: 'include',
 		method: 'POST',
-		body: JSON.stringify({
-		  FarmID: farm_id,
-		  DeviceID: device_id,
-		})
-	  });
-
-	  if (!response.ok) {
+		body: formDataString
+		});
+		
+		if (!response.ok) {
 		throw new Error('Network response was not ok');
-	  }
-
-	  const data = await response.json();
-	  resolve(data); // Resolve the Promise with the response data
+		}
+		
+		const data = await response.json();
+		resolve(data); // Resolve the Promise with the response data
 	} catch (error) {
 	  reject(error); // Reject the Promise with the error
 	}
   });
 }
 
-get_location();
+var device_lat = 0;
+var device_lon = 0;
+const queryString = window.location.search;
+const urlParams = new URLSearchParams(queryString);
+var farm_id = urlParams.get('farm_id');
+var device_id = urlParams.get('device_id');
+var isBoot = true;
+mapboxgl.accessToken = 'pk.eyJ1Ijoia2FuYWRuZW1hZGUiLCJhIjoiY2xudmZyZGhwMGl4ZTJsczg2bnF6Zm04biJ9.Bz8pBCnEPjKDtx1CB8THkA';
+const map = new mapboxgl.Map({
+	container: 'map', // container ID
+	style: 'mapbox://styles/mapbox/satellite-streets-v12', // style URL
+	center: [device_lon,device_lat], // starting position [lng, lat]
+	zoom: 1.75 // starting zoom
+});
+map.addControl(new mapboxgl.NavigationControl());
+
+var el = document.createElement('div');
+el.className = 'my_location_marker';
+my_location_obj = new mapboxgl.Marker(el);
+my_location_obj.setLngLat(map.getCenter()).setPopup(
+	new mapboxgl.Popup({ offset: 25 })
+	  .setHTML(
+		`<h3><b>You</b></h3><p>Location: ${device_lat}, ${device_lon}</p>`
+	  )
+  )
+  .addTo(map);
+my_location_obj.getElement().style.display = "none";
+var el = document.createElement('div');
+el.className = 'device_location_marker';
+device_location_obj = new mapboxgl.Marker(el);
+device_location_obj.setLngLat(map.getCenter()).setPopup(
+	new mapboxgl.Popup({ offset: 25 })
+	  .setHTML(
+		`<h3>Device ID: ${device_id}</h3><p>Location: ${device_lat}, ${device_lon}</p>`
+	  )
+  )
+  .addTo(map);
+device_location_obj.getElement().style.display = "none";
+map.flyTo({
+	center:[79.13732323182083, 23.000469399612122], // Fly to the selected target
+	zoom:4,
+	duration: 5000, // Animate over 12 seconds
+	essential: true // This animation is considered essential with
+	//respect to prefers-reduced-motion
+	});
+function sleep (time) {
+  return new Promise((resolve) => setTimeout(resolve, time));
+}
+sleep(5000).then(() => {
+	get_location();
+});

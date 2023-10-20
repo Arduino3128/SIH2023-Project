@@ -1,6 +1,8 @@
 { pkgs }: {
   deps = [
-    pkgs.nano
-  
+	pkgs.sqlite
+	pkgs.mosquitto
+	pkgs.nano
+	pkgs.go
   ];
 }

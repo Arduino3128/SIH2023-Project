@@ -55,7 +55,11 @@ function getModuleLocation() {
     return new Promise((resolve, reject) => {
         // Check if geolocation is supported by the browser
         if ("geolocation" in navigator) {
-			html5QrCode.pause(shouldPauseVideo, showPausedBanner);
+			try
+			{
+				html5QrCode.pause(shouldPauseVideo, showPausedBanner);
+			}
+			catch(error){}
 			write_status("Fetching Location Data....","#FFFF00");
             // Prompt user for permission to access their location
             navigator.geolocation.getCurrentPosition(
@@ -101,14 +105,17 @@ async function onScanSuccess(decodedText, decodedResult) {
         var jsonString = JSON.parse(decodedText);
 	    
 	    if (checkUUIDFormat(jsonString["DEVICE ID"])) {
-	        // send Request to register!
-	        //alert(jsonString["DEVICE ID"]);
 	        if (jsonString["DEVICE TYPE"] == "ComputeModule") {         
 				farm_id = jsonString["DEVICE ID"];
 	            var device_id = jsonString["DEVICE ID"];
 				write_status("Compute Module Scanned!","#00FF00");
 	            var dev_location = await getModuleLocation();
-				var alias_name = window.prompt("Enter device name: ", device_id)
+				var alias_name = window.prompt("Enter Compute Module's name: ", device_id);
+				if (alias_name==null){
+					write_status("Device registration cancelled!","#FF0000");
+					html5QrCode.resume();
+					return null;
+				}
 				var data_response = await register_device(alias_name, farm_id, device_id, dev_location);
 				html5QrCode.resume();
 				if (data_response["status"]=="REGISTERED"){
@@ -132,7 +139,12 @@ async function onScanSuccess(decodedText, decodedResult) {
 	            var device_id = jsonString["DEVICE ID"];
 	            var dev_location = await getModuleLocation();
 				write_status(`Soil Probe Module scanned under Farm: ${farm_id}!`,"#FFFF00");
-				var alias_name = window.prompt("Enter device name: ", device_id)
+				var alias_name = window.prompt("Enter Soil Probe Module's name: ", device_id);
+				if (alias_name==null){
+					write_status("Device registration cancelled!","#FF0000");
+					html5QrCode.resume();
+					return null;
+				}
 				var data_response = await register_device(alias_name, farm_id, device_id, dev_location);
 				html5QrCode.resume();
 				data_resonse_status = data_response["status"];

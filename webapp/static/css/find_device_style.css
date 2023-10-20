@@ -38,29 +38,30 @@ body {
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
 }
-
-.find-form {
-    position: absolute;
-    margin: auto;
-    text-align: center;
-    height: 75%;
-    width: 100%;
-    top: 0;
-    bottom: 0;
+/*
+.find-compass {
+	display:none;
+	position: absolute;
+	margin: auto;
+	text-align: center;
+	height: 75%;
+	width: 100%;
+	top: 0;
+	bottom: 0;
 }
 
-.find-form img {
+.find-compass img {
 	height: 100%;
 }
-.find-form .center-logo {
+.find-compass .center-logo {
 	height: 30%;
 }
 
-.find-form li{
+.find-compass li{
 	height:25%;
 }
 
-.find-form ul {
+.find-compass ul {
 	list-style-type: none;
 	position: absolute;
 	top: 0;
@@ -71,6 +72,7 @@ body {
 	text-align: center;
 	padding: 0px;
 }
+
 
 @media(min-width:756px){
 .find-container {
@@ -88,6 +90,34 @@ body {
 	-webkit-backdrop-filter: blur(10px);
 	backdrop-filter: blur(10px);
 }
+}
+*/
+.find-maps {
+	position: absolute;
+	margin: auto;
+	text-align: center;
+	height: 97%;
+	width: 95%;
+	top: 0;
+	bottom: 0;
+	right: 0;
+	left: 0;
+}
+
+.find-container {
+	position: absolute;
+	right: 0;
+	left: 0;
+	top: 0;
+	bottom: 0;
+	margin: auto;
+	height: 85%;
+	width: 80%;
+	border: 1px solid transparent;
+	border-radius: 15px;
+	background-color: rgba(255, 255, 255, 0.25);
+	-webkit-backdrop-filter: blur(10px);
+	backdrop-filter: blur(10px);
 }
 
 .header {
@@ -110,17 +140,96 @@ body {
 	cursor: pointer;
 }
 
-#compass {
-	transform: rotateZ(0deg);
-	margin-top: -30px;
-	height: 150%;
+#device-info {
+	font-size: small;
+	background: rgba(255,255,255,0.3);
+	backdrop-filter: blur(10px);
+	position: relative;
+	z-index: 1;
+	border: 1px solid black;
+	border-radius: 15px;
+	margin: 30px;
+	margin-right: 50px;
+	margin-top: 10px;
 }
 
-#device-info{
-	font-size:small;
-	margin-top:10px;
+#pose {
+	font-size: small;
+	margin-top: 10px;
+	background: rgba(255,255,255,0.3);
+	backdrop-filter: blur(10px);
+	position: absolute;
+	z-index: 1;
+	border: 1px solid black;
+	border-radius: 15px;
+	margin: 10px;
+	margin-right: 50px;
+	bottom: 0;
+	right: 0;
+	left: 0;
+	margin-left: 110px;
 }
 
-#pose{
-	padding-top:40px;
+#map {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	width: 100%;
+	border: 1px solid transparent;
+	border-radius: 15px;
+}
+
+.my_location_marker {
+  background-image: url('/images/device_locate_green.svg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  filter: hue-rotate(180deg);
+}
+
+.device_location_marker {
+  background-image: url('/images/device_nearby_green.svg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  filter: hue-rotate(180deg);
+}
+
+@media(min-width:800px){
+.find-container {
+	position: absolute;
+	right: 0;
+	left: 0;
+	top: 0;
+	bottom: 0;
+	margin: auto;
+	height: 90%;
+	width: 50%;
+	border: 1px solid transparent;
+	border-radius: 15px;
+	background-color: rgba(255, 255, 255, 0.25);
+	-webkit-backdrop-filter: blur(10px);
+	backdrop-filter: blur(10px);
+}
+
+#pose {
+	font-size: small;
+	margin-top: 10px;
+	background: rgba(255,255,255,0.3);
+	backdrop-filter: blur(10px);
+	position: absolute;
+	z-index: 1;
+	border: 1px solid black;
+	border-radius: 15px;
+	margin: 10px;
+	margin-right: 50%;
+	bottom: 0;
+	right: 0;
+	left: 0;
+	margin-left: 110px;
+}
 }

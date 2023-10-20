@@ -8,7 +8,7 @@ Private Repository for Smart India Hackathon 2023
   
 ## Repository Structure:  
   
-| Branch | Description |  
+| Folder | Description |  
 | ------ | ----------- |  
 | main | Commit only general things here. |  
 | hardware | Commit only hardware related stuff. |  

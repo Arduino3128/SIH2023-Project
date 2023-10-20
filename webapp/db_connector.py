@@ -165,6 +165,7 @@ class Database:
 										"Location": location,
 										"AliasName":alias_name,
 										"MACID": _info["device"]["mac_id"],
+										"ValveState":False,
 										"SensorData": {
 											"Humidity": 0.0,
 											"Temperature": 0.0,
@@ -211,25 +212,53 @@ class Database:
 		return False
 
 	def api(self, dev_id, farm_id, value_type, token, totp, value):
-		if self.verify_device_request(dev_id, token, totp):
-			query = {}
-			data = {}
-			match value_type:
-				case "SensorData":
-					query = {
-						f"UserAsset.{farm_id}.ProbeModule.{dev_id}": {"$exists": True}
-					}
-					data = {
-						"$set": {
-							f"UserAsset.{farm_id}.ProbeModule.{dev_id}.SensorData": json.loads(
-								value
-							)
+		try:
+			if self.verify_device_request(dev_id, token, totp):
+				query = {}
+				data = {}
+				match value_type:
+					case "SetSensorData":
+						query = {
+							f"UserAsset.{farm_id}.ProbeModule.{dev_id}": {"$exists": True}
 						}
-					}
-
-					_result = self.collection.update_one(query, data)
-					if _result.modified_count > 0:
-						return True
-				case other:
-					return False
-		return False
+						data = {
+							"$set": {
+								f"UserAsset.{farm_id}.ProbeModule.{dev_id}.SensorData": json.loads(
+									value
+								)
+							}
+						}
+	
+						_result = self.collection.update_one(query, data)
+						if _result.modified_count > 0:
+							return {value_type:True}
+						else:
+							return {value_type:False}
+							
+					case "GetValveState":
+						query = {
+							f"UserAsset.{farm_id}.ProbeModule.{dev_id}": {"$exists": True}
+						}
+						_result = self.collection.find_one(query)
+						if _result:
+							return {value_type :_result["UserAsset"][farm_id]["ProbeModule"][dev_id]["ValveState"]}
+			
+					case "SetValveState":
+						query = {
+							f"UserAsset.{farm_id}.ProbeModule.{dev_id}": {"$exists": True}
+						}
+						data = {
+							"$set": {
+								f"UserAsset.{farm_id}.ProbeModule.{dev_id}.ValveState": value
+							}
+						}
+						_result = self.collection.update_one(query, data)
+						if _result.modified_count > 0:
+							return {value_type:True}
+						else:
+							return {value_type:False}
+					case other:
+						return {"Error":"Invalid Parameter"}
+			return {"Error":"Authentication Failure"}
+		except Exception as ERROR:
+			return {"Error":ERROR}

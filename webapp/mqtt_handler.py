@@ -14,7 +14,7 @@ class MQTTHandler:
 		self.DB=Database()
 		app_config = dotenv_values(".env")
 		mongodb_url = app_config["MONGODB_URL"].format(app_config['MONGODB_USER'],app_config['MONGODB_PASS'])
-		self.DB.connect(mongodb_url,app_config["MONGODB_DB"],app_config["MONGODB_COLLECTION"])
+		self.DB.connect(mongodb_url,app_config["MONGODB_DB"],app_config["MONGODB_COLLECTION"],app_config["MONGODB_DEVICE_COLLECTION"])
 		self.client = self.connect_mqtt()
 		self.client.subscribe("device/#")
 		self.client.on_message = self.on_message
@@ -39,6 +39,7 @@ class MQTTHandler:
 			pass
 
 	def on_message(self, client, userdata, message):
+		print(message.topic)
 		self.push_to_db(message)
 
 	def connect_mqtt(self) -> mqtt_client:
@@ -48,7 +49,7 @@ class MQTTHandler:
 			else:
 				print("Failed to connect, return code %d\n", rc)
 
-		client = mqtt_client.Client("Main Server")
+		client = mqtt_client.Client("Main Server",transport="websockets")
 		client.on_connect = on_connect
 		#client.tls_set(certfile=r"/home/ubuntu/certs/fullchain.pem",keyfile=r"/home/ubuntu/certs/privkey.pem",tls_version=ssl.PROTOCOL_TLSv1_2,)
 		#client.tls_insecure_set(True)

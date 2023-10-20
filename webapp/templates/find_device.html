@@ -6,21 +6,26 @@
     <title>Barely Afloat - Find Device - 2023</title>
     <link rel="icon" type="image/png" href="/images/logo.png" />
     <link rel="stylesheet" href="/css/find_device_style.css">
+	<link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
+	<script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
 </head>
 
 <body>
 	<div class="header"><button onclick="document.location='/dashboard'">← Back</button></div>
     <div class="main-container">
         <div class="find-container">
-            <div class="find-form">
-				<ul>
-					<li class="center-logo"><img src="/images/flat_logo.png"></li>
-					<li id="device-info">Locating Device!</li>
-					<li><img id="compass" src="/images/arrow.png"></li>
-					<li id="pose">Fetching Location!</li>
-				</ul>
-        </div>
-    </div>
+			<form id="data_form" action="/dashboard/find_device" method="post">
+				<input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+				<input type="hidden" name="farm_id" value="{{ farm_id }}" required>
+				<input type="hidden" name="device_id" value="{{ device_id }}" required>
+			</form>
+			<div class="find-maps">
+				<div id="device-info">Locating Device!</div>
+				<div id="map"></div>
+				<div id="pose">Fetching Location!</div>
+			</div>
+    	</div>
+	</div>
 	<script src="/js/find_device_js.js"></script>
 </body>
 

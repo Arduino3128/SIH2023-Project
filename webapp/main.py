@@ -34,8 +34,8 @@ app.permanent_session_lifetime = timedelta(weeks=1)
 # app.config['SESSION_MONGODB'] = mongo_client
 # app.config['SESSION_MONGODB_DB']=app_config["MONGODB_DB"]
 # app.config['SESSION_MONGODB_COLLECT']=app_config["MONGODB_SESSION_COLLECTION"]
+# app.config['SESSION_USE_SIGNER'] = True
 app.config["SESSION_TYPE"] = "filesystem"
-# app.config['SESSION_USE_SIGNER'] =  True
 app.config["SESSION_FILE_DIR"] = app_config["SESSION_FILE_DIR"]
 app.config.update(
     SESSION_COOKIE_SECURE=True,
@@ -134,9 +134,7 @@ def register_device():
                     data = json.loads(request.data)
                     device_id = data.get("DeviceID")
                     alias_name = data.get("AliasName")
-                    farm_id = data.get(
-                        "FarmID"
-                    )  # get based on location? or scan the QR on the Compute module first and then QR on Soil Probe?
+                    farm_id = data.get("FarmID")
                     location = data.get("Location")
                     _status = DB.register_device(
                         session.get("Username"),
@@ -156,15 +154,15 @@ def register_device():
 
 
 @app.route("/dashboard/find_device", methods=["GET", "POST"])
-@csrf.exempt
 def find_device():
     if session.get("Username"):
         if DB.verify_user(session.get("Username"), session.get("Password")):
             if request.method == "POST":
                 try:
-                    data = json.loads(request.data)
-                    device_id = data.get("DeviceID")
-                    farm_id = data.get("FarmID")
+                    #data = json.loads(request.data)
+                    device_id = request.form.get(
+                        "device_id")  #data.get("DeviceID")
+                    farm_id = request.form.get("farm_id")  #data.get("FarmID")
                     _data = DB.fetch_single_probe(session.get("Username"),
                                                   farm_id, device_id)
                     if _data != {}:
@@ -173,9 +171,10 @@ def find_device():
                 except:
                     return {"status": "FAIL"}
             else:
-                return render_template("find_device.html")
-    else:
-        return redirect("/login")
+                return render_template("find_device.html",
+                                       farm_id=request.args.get("farm_id"),
+                                       device_id=request.args.get("device_id"))
+    return redirect("/login")
 
 
 # -------------- API ROUTERS --------------------
@@ -189,7 +188,7 @@ def api():
     farm_id = request.form.get("farm_id")
     dev_id = request.form.get("dev_id")
     _status = {
-        "status": DB.api(dev_id, farm_id, value_type, token, totp, value)
+        "response": DB.api(dev_id, farm_id, value_type, token, totp, value)
     }
     return _status
 
@@ -210,8 +209,3 @@ def keep_alive():
     print("⎆ Starting Web Server.....")
     t = Thread(target=run)
     t.start()
-
-
-# keep_alive()
-
-# app.run(debug=True, host="0.0.0.0", port=8080)

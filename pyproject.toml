@@ -18,6 +18,10 @@ flask-wtf = "^1.2.1"
 pycryptodome = "^3.19.0"
 pyotp = "^2.9.0"
 qrcode = "^7.4.2"
+websockets = "^11.0.3"
+starlette = "^0.31.1"
+uvicorn = "^0.23.2"
+sse-starlette = "^1.6.5"
 
 [tool.pyright]
 # https://github.com/microsoft/pyright/blob/main/docs/configuration.md
