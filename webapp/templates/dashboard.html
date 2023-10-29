@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Barely Afloat - Dashboard - 2023</title>
+        <link rel="icon" type="image/png" href="/images/logo.png" />
+        <link rel="stylesheet" href="/css/dashboard_style.css">
+		<link rel="preload" href="/images/close_icon.png" as="image">
+		<link rel="preload" href="/images/device_locate_green.svg" as="image">
+        <meta name="viewport" content="width=device-width">
+    </head>
+    <body>
+        <div class="main-container">
+            
+        </div>
+		<div id="sidenav" class="sidenav">
+			<a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+			<a href="/dashboard/profile">Profile</a>
+			<a id="reg_dev_link" href="/dashboard/register_device">Register Device</a>
+			<a href="/logout">Logout</a>
+		</div>
+		<div class="centered-img">
+			<img src="/images/flat_logo.png" class="logo">
+			<button class="menu" onclick="openNav()" id="menu_btn">
+			<!--img src="/images/hamburger_icon.png"-->
+				<div class="hamburger">
+					<div class="bar"></div>
+					<div class="bar"></div>
+					<div class="bar"></div>
+				</div>
+			</button>
+		</div>
+		<br>
+		<div class="set">
+			<select id="farm"></select>
+			<div class="last-update">Fetching Probes...</div>
+			<hr>
+			<label class="farm-name">Loading...</label>
+			<hr>
+			<div class="grid-container">
+			</div>
+		</div>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.umd.min.js"></script>
+        <script src="/js/dashboard.js"></script>
+        <!-- <script src="Gauge.js"></script> -->
+    </body>
+</html>

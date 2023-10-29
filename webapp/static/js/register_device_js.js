@@ -1,3 +1,8 @@
+function isUUID(uuid) {
+  const uuidPattern = /^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i;
+  return uuidPattern.test(uuid);
+}
+
 function write_farm_id(text){
 	var _fm_id = document.getElementById("FarmID");
 	_fm_id.innerHTML = `Farm ID: ${text}`;
@@ -9,7 +14,12 @@ function write_status(text,color){
 	_status.style.color = color;
 }
 
-var farm_id;
+var farm_id = document.getElementsByName("farm_id")[0].value;
+if (isUUID(farm_id))
+	write_farm_id(farm_id)
+else
+	farm_id = undefined;
+
 var data_response;
 let shouldPauseVideo = true;
 let showPausedBanner = false;
@@ -92,19 +102,15 @@ function getModuleLocation() {
     });
 }
 
-function checkUUIDFormat(decodedText) {
-    const v4 = new RegExp(/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i);
-    if (decodedText.match(v4)) {
-        return true;
-    }
-    return false;
-}
+function sleep(ms) {
+	  return new Promise(resolve => setTimeout(resolve, ms));
+   }
 
 async function onScanSuccess(decodedText, decodedResult) {
     try {
         var jsonString = JSON.parse(decodedText);
 	    
-	    if (checkUUIDFormat(jsonString["DEVICE ID"])) {
+	    if (isUUID(jsonString["DEVICE ID"])) {
 	        if (jsonString["DEVICE TYPE"] == "ComputeModule") {         
 				farm_id = jsonString["DEVICE ID"];
 	            var device_id = jsonString["DEVICE ID"];
@@ -113,11 +119,11 @@ async function onScanSuccess(decodedText, decodedResult) {
 				var alias_name = window.prompt("Enter Compute Module's name: ", device_id);
 				if (alias_name==null){
 					write_status("Device registration cancelled!","#FF0000");
+					farm_id = undefined;
 					html5QrCode.resume();
 					return null;
 				}
 				var data_response = await register_device(alias_name, farm_id, device_id, dev_location);
-				html5QrCode.resume();
 				if (data_response["status"]=="REGISTERED"){
 					write_farm_id(farm_id);
 					write_status("Compute Module Registered!","#00FF00");
@@ -130,6 +136,7 @@ async function onScanSuccess(decodedText, decodedResult) {
 					write_farm_id(farm_id);
 					write_status("Scan Soil Probe Module to register!","#00FF00");
 				}
+				html5QrCode.resume();
 	        }
 	        else if (jsonString["DEVICE TYPE"] == "SoilProbeModule") {
 				if (typeof farm_id === 'undefined'){
@@ -177,20 +184,21 @@ function register_device(alias_name, farm_id, device_id, dev_location) {
 		} catch (error) {
 			
 		}
-      const response = await fetch('/dashboard/register_device', {
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        credentials: 'include',
-        method: 'POST',
-        body: JSON.stringify({
-		  AliasName: alias_name,
-          FarmID: farm_id,
-          DeviceID: device_id,
-          Location: dev_location
-        })
-      });
+		document.getElementsByName("farm_id")[0].value = farm_id;
+		document.getElementsByName("device_id")[0].value = device_id;
+		document.getElementsByName("location")[0].value = dev_location;
+		document.getElementsByName("alias_name")[0].value = alias_name;
+		const formData = new FormData(document.getElementById('data_form'));
+		const formDataString = new URLSearchParams(formData).toString();
+		const response = await fetch('/dashboard/register_device', {
+		  headers: {
+			'Content-Type': 'application/x-www-form-urlencoded'
+		  },
+		credentials: 'include',
+		method: 'POST',
+		body: formDataString
+		});
+
 
       if (!response.ok) {
         throw new Error('Network response was not ok');

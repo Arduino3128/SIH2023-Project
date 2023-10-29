@@ -16,6 +16,13 @@
             <span id="FarmID"></span>
 			<div id="reader"></div>
 			<span id="Status">Scan Compute Module!</span>
+			<form id="data_form" action="/dashboard/register_device" method="post">
+				<input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+				{% if farm_id %}<input type="hidden" name="farm_id" value="{{ farm_id }}" required>{% else %}<input type="hidden" name="farm_id" required>{% endif %}
+				<input type="hidden" name="device_id" required>
+				<input type="hidden" name="alias_name" required>
+				<input type="hidden" name="location" required>
+			</form>
         </div>
     </div>
 	<script src="/js/register_device_js.js"></script>

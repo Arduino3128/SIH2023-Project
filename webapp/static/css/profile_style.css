@@ -1,0 +1,82 @@
+* {
+	margin: 0;
+}
+
+html,
+body {
+	max-width: 100%;
+	overflow-x: hidden;
+	background-image: url('/images/login_background.jpeg');
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+	background-size: cover;
+}
+
+.main-container {
+	height: 100%;
+	width: 100%;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	position: absolute;
+	background: linear-gradient(to bottom, transparent 0%, black 200%);
+}
+
+.profile-container {
+	position: absolute;
+	right: 0;
+	left: 0;
+	top: 0;
+	bottom: 0;
+	margin: auto;
+	height: fit-content;
+	width: 75%;
+	border: 1px solid transparent;
+	border-radius: 15px;
+	background-color: rgba(255, 255, 255, 0.25);
+	-webkit-backdrop-filter: blur(10px);
+	backdrop-filter: blur(10px);
+	max-width: 400px;
+	padding:20px;
+	text-align:center;
+}
+
+.profile-container .logo-img {
+	max-width: 200px;
+	margin: auto;
+	width: 80%;
+	display: block;
+}
+
+.profile-container .profile-img {
+	max-width: 150px;
+	max-height: 150px;
+	margin: auto;
+	width: 80%;
+	height: 80%;
+}
+
+.profile-container p{
+	font-size:large;
+}
+
+.header {
+	height: 10%;
+	width:100%;
+	z-index: 1;
+	position: absolute;
+}
+
+.header button{
+	position: absolute;
+	left: 0;
+	margin: 10px;
+	padding:10px;
+	border:1px solid transparent;
+	border-radius: 15px;
+}
+
+.header button:hover {
+	cursor: pointer;
+}

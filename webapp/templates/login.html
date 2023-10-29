@@ -10,6 +10,10 @@
 
 <body>
     <div class="main-container">
+		<div class="banner"><p>Please use the following credentials:</p>
+			<p>Username: {{ test_user }}</p>
+			<p>Password: {{ test_pass }}</p>
+		</div>
         <div class="login-container">
             <div class="login-form">
                 <img src="/images/flat_logo.png">
@@ -19,6 +23,7 @@
                     <input type="password" id="password" name="password" placeholder="Password" required>
                     <input type="submit" value="Login">
                 </form>
+				<p style="margin:10px;">Don't have an account? <a style="color:rgb(83, 179, 64);background: aliceblue;border-radius: 2px;padding: 2px;" href="/register">Create here</a></p>
             </div>
         </div>
     </div>

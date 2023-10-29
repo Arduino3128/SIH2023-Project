@@ -70,9 +70,40 @@ class Database:
 		except:
 			return {}	
 
+	def set_valve_state(self, farm_id, dev_id, value):
+		try:
+			query = {
+				f"UserAsset.{farm_id}.ProbeModule.{dev_id}": {"$exists": True}
+			}
+			data = {
+				"$set": {
+					f"UserAsset.{farm_id}.ProbeModule.{dev_id}.ValveState": int(value)
+				}
+			}
+			_result = self.collection.update_one(query, data)
+			if _result.modified_count > 0:
+				return {"update_probe":True}
+			else:
+				return {"update_probe":False}
+		except:
+			return {"update_probe":False}
+	
 	def get_device_info(self, device_id):
 		_dev_info = self.device_collection.find_one({"device.id": device_id})
 		return _dev_info
+
+	def farm_exists(self,username,farm_id):
+		_farm_info = self.collection.find_one(
+			{
+				"$and": [
+					{"UserInfo.Username": username},
+					{f"UserAsset.{farm_id}": {"$exists": True}},
+				]
+			}
+		)
+		if _farm_info:
+			return True
+		return False
 
 	def check_asset(self, username, device_id, device_type, _info):
 		if device_type == "SoilProbeModule":
@@ -108,6 +139,7 @@ class Database:
 						"Location": location,
 						"AliasName":alias_name,
 						"MACID": _info["device"]["mac_id"],
+						"ValveState":0,
 						"SensorData": {
 							"Humidity": 0.0,
 							"Temperature": 0.0,
@@ -157,7 +189,7 @@ class Database:
 							_result = self.collection.update_one(query, data)
 						elif (
 							_info["device"]["type"] == "SoilProbeModule"
-							and farm_id != None
+							and farm_id != None and self.farm_exists(username, farm_id)
 						):
 							data = {
 								"$set": {
@@ -165,7 +197,7 @@ class Database:
 										"Location": location,
 										"AliasName":alias_name,
 										"MACID": _info["device"]["mac_id"],
-										"ValveState":False,
+										"ValveState":0,
 										"SensorData": {
 											"Humidity": 0.0,
 											"Temperature": 0.0,
@@ -177,9 +209,9 @@ class Database:
 							query = {"UserInfo.Username": username}
 							_result = self.collection.update_one(query, data)
 					else:
-						if self.check_asset(
+						if (self.check_asset(
 							username, device_id, _info["device"]["type"], _info
-						):
+						) and self.farm_exists(username, farm_id)):
 							if self.reregister_device(
 								username, device_id, location, alias_name, farm_id, _info
 							):
@@ -210,6 +242,12 @@ class Database:
 			if totp_obj.verify(totp):
 				return True
 		return False
+
+	def fetch_farm_list(self,username):
+		_farm_list = self.collection.find_one({"UserInfo.Username":username})
+		if _farm_list:
+			return _farm_list.get("UserAsset")
+		return {}
 
 	def api(self, dev_id, farm_id, value_type, token, totp, value):
 		try:
@@ -249,7 +287,7 @@ class Database:
 						}
 						data = {
 							"$set": {
-								f"UserAsset.{farm_id}.ProbeModule.{dev_id}.ValveState": value
+								f"UserAsset.{farm_id}.ProbeModule.{dev_id}.ValveState": int(value)
 							}
 						}
 						_result = self.collection.update_one(query, data)

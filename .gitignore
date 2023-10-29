@@ -1,3 +1,4 @@
 *.env
+*.logs.txt
 *__pycache__/
 *.mosquitto/

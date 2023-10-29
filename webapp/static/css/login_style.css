@@ -24,29 +24,30 @@ body {
 }
 
 .login-container {
-    position: absolute;
-    right: 0;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    margin: auto;
-    height: 50%;
-    width: 75%;
-    border: 1px solid transparent;
-    border-radius: 15px;
-    background-color: rgba(255, 255, 255, 0.25);
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
+	position: absolute;
+	right: 0;
+	left: 0;
+	top: 0;
+	bottom: 0;
+	margin: auto;
+	height: fit-content;
+	width: 75%;
+	border: 1px solid transparent;
+	border-radius: 15px;
+	background-color: rgba(255, 255, 255, 0.25);
+	-webkit-backdrop-filter: blur(10px);
+	backdrop-filter: blur(10px);
+	max-width: 400px;
 }
 
 .login-form {
-    position: absolute;
-    margin: auto;
-    text-align: center;
-    height: 75%;
-    width: 100%;
-    top: 0;
-    bottom: 0;
+	position: relative;
+	margin: auto;
+	text-align: center;
+	height: 75%;
+	width: 100%;
+	top: 0;
+	bottom: 0;
 }
 
 .login-form input[type="submit"] {
@@ -65,6 +66,7 @@ body {
 
 .login-form input[type="submit"]:hover {
    	background-color: #4aa237;
+	cursor:pointer;
 }
 
 .login-form input[type="text"],
@@ -78,23 +80,13 @@ input[type="password"] {
 }
 
 .login-form img {
-    height: 30%;
-}
-
-@media(min-width:756px){
-.login-container {
-	position: absolute;
-	right: 0;
-	left: 0;
-	top: 0;
-	bottom: 0;
+	max-width: 300px;
 	margin: auto;
-	height: 50%;
-	width: 30%;
-	border: 1px solid transparent;
-	border-radius: 15px;
-	background-color: rgba(255, 255, 255, 0.25);
-	-webkit-backdrop-filter: blur(10px);
-	backdrop-filter: blur(10px);
+	margin-top: 20px;
+	width: 80%;
 }
+.banner{
+	background-color:yellow;
+	text-align:center;
+	padding:5px;
 }

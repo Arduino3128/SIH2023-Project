@@ -16,8 +16,8 @@ def run():
             "0.0.0.0:8080",
             "--worker-class",
             "gevent",
-            #"--workers",
-            #"2",
+            "--workers",
+            "1",
         ])
     except Exception as error:
         print("⎈ Failed to start Web Server.")

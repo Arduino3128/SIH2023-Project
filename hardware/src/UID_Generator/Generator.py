@@ -38,7 +38,7 @@ qr = qrcode.QRCode(
     version=1,
     error_correction=qrcode.constants.ERROR_CORRECT_L,
     box_size=10,
-    border=4,
+    border=2,
 )
 
 QR_String = '{"DEVICE ID":"' + Device_ID + '","DEVICE TYPE":"' + Device_Type + '"}'
