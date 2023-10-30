@@ -1,13 +1,22 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Barely Afloat - Dashboard - 2023</title>
+		<link rel="stylesheet" href="/css/dashboard_style.css">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Barely Afloat - {{ username }}'s Dashboard - 2023</title>
         <link rel="icon" type="image/png" href="/images/logo.png" />
-        <link rel="stylesheet" href="/css/dashboard_style.css">
 		<link rel="preload" href="/images/close_icon.png" as="image">
 		<link rel="preload" href="/images/device_locate_green.svg" as="image">
         <meta name="viewport" content="width=device-width">
+		<!-- Google tag (gtag.js) -->
+		<script async src="https://www.googletagmanager.com/gtag/js?id=G-PFHQ43RCK8"></script>
+		<script>
+		  window.dataLayer = window.dataLayer || [];
+		  function gtag(){dataLayer.push(arguments);}
+		  gtag('js', new Date());
+
+		  gtag('config', 'G-PFHQ43RCK8');
+		</script>
     </head>
     <body>
         <div class="main-container">
@@ -15,14 +24,13 @@
         </div>
 		<div id="sidenav" class="sidenav">
 			<a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-			<a href="/dashboard/profile">Profile</a>
-			<a id="reg_dev_link" href="/dashboard/register_device">Register Device</a>
-			<a href="/logout">Logout</a>
+			<a class="sidebar-link" href="/dashboard/profile">Profile</a>
+			<a class="sidebar-link" id="reg_dev_link" href="/dashboard/register_device">Register Device</a>
+			<a class="sidebar-link" href="/logout">Logout</a>
 		</div>
 		<div class="centered-img">
 			<img src="/images/flat_logo.png" class="logo">
 			<button class="menu" onclick="openNav()" id="menu_btn">
-			<!--img src="/images/hamburger_icon.png"-->
 				<div class="hamburger">
 					<div class="bar"></div>
 					<div class="bar"></div>
@@ -43,6 +51,5 @@
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.umd.min.js"></script>
         <script src="/js/dashboard.js"></script>
-        <!-- <script src="Gauge.js"></script> -->
     </body>
 </html>

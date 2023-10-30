@@ -27,13 +27,6 @@ app = Flask(__name__, static_url_path="", static_folder="static")
 csrf = CSRFProtect(app)
 app.secret_key = app_config["FLASK_SECRET_KEY"]
 app.permanent_session_lifetime = timedelta(weeks=1)
-
-# app.config['SESSION_TYPE'] = "mongodb"
-# app.config['SESSION_USE_SIGNER'] =  True
-# app.config['SESSION_MONGODB'] = mongo_client
-# app.config['SESSION_MONGODB_DB']=app_config["MONGODB_DB"]
-# app.config['SESSION_MONGODB_COLLECT']=app_config["MONGODB_SESSION_COLLECTION"]
-# app.config['SESSION_USE_SIGNER'] = True
 app.config["SESSION_TYPE"] = "filesystem"
 app.config["SESSION_FILE_DIR"] = app_config["SESSION_FILE_DIR"]
 app.config.update(
@@ -82,10 +75,7 @@ def register():
 			_status = DB.register_user(username, password)
 			if _status:
 				return redirect("/login")
-			else:
-				return redirect("/register")
-		else:
-			return redirect("/register")
+		return redirect("/register")
 	else:
 		return render_template("register.html")
 
@@ -99,7 +89,7 @@ def login():
 			if username == "Test101":
 				with open(".logs.txt", "a") as file:
 					file.write(
-						f"Timestamp: {datetime.now()} UTC | Username: {username} | IP: {request.remote_addr}"
+						f"Timestamp: {datetime.now()} UTC | Username: {username} | IP: {request.remote_addr}\n"
 					)
 		except:
 			pass
@@ -154,12 +144,11 @@ def dashboard():
 					return DB.set_valve_state(farm_id, device_id, value)
 				return {}
 			else:
-				return render_template("dashboard.html")
+				return render_template("dashboard.html",username=session.get("Username"))
 	return redirect("/login")
 
 
 @app.route("/dashboard/register_device", methods=["GET", "POST"])
-@csrf.exempt
 def register_device():
 	if session.get("Username"):
 		if DB.verify_user(session.get("Username"), session.get("Password")):

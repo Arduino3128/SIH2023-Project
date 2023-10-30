@@ -56,8 +56,9 @@ body {
 	top: 0;
 	bottom: 0;
 	margin: auto;
-	width: 75%;
-	height:75%;
+	width: 90%;
+	height: fit-content;
+	max-width: 500px;
 	border: 1px solid transparent;
 	border-radius: 15px;
 	background-color: rgba(255, 255, 255, 0.25);
@@ -67,24 +68,11 @@ body {
 	display: grid;
 }
 
-@media(min-width:756px){
-	.register-dev-container {
-	position: absolute;
-	right: 0;
-	left: 0;
-	top: 0;
-	bottom: 0;
+.logo {
+	max-width: 300px;
 	margin: auto;
-	width: 500px;
-	height: 500px;
-	border: 1px solid transparent;
-	border-radius: 15px;
-	background-color: rgba(255, 255, 255, 0.25);
-	-webkit-backdrop-filter: blur(10px);
-	backdrop-filter: blur(10px);
-	align-content: center;
-	display: grid;
-}
+	margin-top: 20px;
+	width: 80%;
 }
 
 #reader,video, #qr-shaded-region{

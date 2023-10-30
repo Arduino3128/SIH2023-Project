@@ -1,4 +1,7 @@
-// Function to get the geolocation
+function isiOS() {
+	return ["iPad Simulator", "iPhone Simulator", "iPod Simulator", "iPad", "iPhone", "iPod"].includes(navigator.platform) || navigator.userAgent.includes("Mac") && "ontouchend" in document
+}
+
 async function getGeolocation() {
 	return new Promise((resolve, reject) => {
 		if ("geolocation" in navigator) {
@@ -28,10 +31,12 @@ function write_status(text,color="#000000"){
 function getDeviceOrientation() {
 	return new Promise((resolve, reject) => {
 		if ("DeviceOrientationEvent" in window) {
-			window.addEventListener("deviceorientationabsolute", (event) => {
-				const alpha = event.alpha; // Compass direction (0-360 degrees)
-				resolve(alpha);
-			});
+				const eventName = isiOS() ? "deviceorientation" : "deviceorientationabsolute";
+				window.addEventListener(eventName, (event) => {
+					//const alpha = event.alpha; // Compass direction (0-360 degrees)
+					event.webkitCompassHeading ? absoluteHeading = event.webkitCompassHeading - 180 : absoluteHeading = 180 + event.alpha, absoluteHeading -= 180, 360 < absoluteHeading && (absoluteHeading -= 360);
+					resolve(absoluteHeading);
+				});
 		} else {
 			reject("Device orientation is not supported by this browser.");
 		}
@@ -46,17 +51,14 @@ async function getLocationAndOrientationEverySecond() {
 			var orientation = await getDeviceOrientation();
 			var bearing = calculateInitialBearing(device_lat,device_lon,geolocation.lat,geolocation.lng)
 			var distance = calculateDistance(geolocation.lat,geolocation.lng,device_lat,device_lon)
-			var turnAngle = (bearing-orientation);
-			if (turnAngle>360){
-				turnAngle = turnAngle-360;
-			}
+			var turnAngle = (orientation-bearing);
 			write_status(`Distance: ${distance.toFixed(2)}m<br>Angle: ${turnAngle.toFixed(2)}deg`);
 			map.setCenter([geolocation.lng,geolocation.lat]);
 			if (isBoot){
 				map.setZoom(17);
 				isBoot = false;
 			}
-			map.setBearing(turnAngle);
+			map.setBearing(-orientation);
 			my_location_obj.setLngLat(map.getCenter()).setPopup(
 				new mapboxgl.Popup({ offset: 25 })
 				  .setHTML(

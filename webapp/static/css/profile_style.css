@@ -57,8 +57,18 @@ body {
 	height: 80%;
 }
 
-.profile-container p{
-	font-size:large;
+.profile-container p {
+	font-size: large;
+	margin: auto;
+	width: fit-content;
+	margin-top: 20px;
+	transition: all 0.5s ease-in-out;
+	padding: 5px;
+	border-radius:5px;
+}
+
+.profile-container p:hover {
+	background:rgba(255,255,255,0.5);
 }
 
 .header {
@@ -79,4 +89,9 @@ body {
 
 .header button:hover {
 	cursor: pointer;
+}
+
+hr{
+	margin: 20px;
+	border: 2px solid black;
 }
