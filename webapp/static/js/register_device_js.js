@@ -128,7 +128,7 @@ async function onScanSuccess(decodedText, decodedResult) {
 					write_farm_id(farm_id);
 					write_status("Compute Module Registered!","#00FF00");
 				}
-				else if (data_response["status"]=="NOTUSERFAIL"){
+				else if (data_response["status"]=="NOTUSERFAIL" || data_response["status"]=="FAIL"){
 					farm_id=undefined;
 					write_status("Could not register Compute Module","#FF0000");
 				}

@@ -85,6 +85,12 @@ input[type="password"] {
 	margin-top: 20px;
 	width: 80%;
 }
+
+#info{
+	margin:10px;
+	color:#FF0000
+}
+
 .banner{
 	background-color:yellow;
 	text-align:center;

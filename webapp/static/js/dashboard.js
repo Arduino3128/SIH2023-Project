@@ -41,7 +41,7 @@ function createGauge(sensor_data, sensorId) {
 	};
 	var SWI = sensor_data[sensorId]["SensorData"]["SWI"];
 	sensor_data[sensorId]["ChartData"] = data;
-	sensor_data[sensorId]["ChartData"].datasets[0].needleValue = SWI; // BUG HERE MAYBE!!!!!!!
+	sensor_data[sensorId]["ChartData"].datasets[0].needleValue = SWI;
 	var gaugeNeedle = {
 		id: 'gaugeNeedle-'+sensorId,
 		afterDatasetsDraw(chart, args, plugins) {

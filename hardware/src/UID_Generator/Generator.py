@@ -3,12 +3,23 @@ import random
 import pyotp
 from bson import ObjectId
 import qrcode
+from PIL import Image
+
+logo_link = "logo.jpg"
+logo = Image.open(logo_link)
+basewidth = 400
+
+# adjust image size
+wpercent = (basewidth / float(logo.size[0]))
+hsize = int((float(logo.size[1]) * float(wpercent)))
+logo = logo.resize((basewidth, hsize))
+QRcode = qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_H)
 
 MAC_Prefix = ['0xBA', '0xAF', '0x00']  # Barely Afloat MAC Prefix
 API_Key = str(uuid.uuid4())
 Device_ID = str(uuid.uuid4())
 Device_Type = "SoilProbeModule"
-#Device_Type = "ComputeModule"
+Device_Type = "ComputeModule"
 TOTP_Key = pyotp.random_base32()
 Obj_ID = str(ObjectId())
 
@@ -46,6 +57,9 @@ QR_String = '{"DEVICE ID":"' + Device_ID + '","DEVICE TYPE":"' + Device_Type + '
 qr.add_data(QR_String)
 qr.make(fit=True)
 
-img = qr.make_image(fill_color="black", back_color="white")
+img = qr.make_image(fill_color="black",
+                    back_color="white").convert('RGBA').resize((2000, 2000))
+pos = ((img.size[0] - logo.size[0]) // 2, (img.size[1] - logo.size[1]) // 2)
+img.paste(logo, pos)
 
 img.show()

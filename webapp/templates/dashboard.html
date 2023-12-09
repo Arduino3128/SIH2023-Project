@@ -8,6 +8,15 @@
 		<link rel="preload" href="/images/close_icon.png" as="image">
 		<link rel="preload" href="/images/device_locate_green.svg" as="image">
         <meta name="viewport" content="width=device-width">
+		<script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js"></script>
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css"/>
+		<script>
+			function afterLoader(){
+				var script = document.createElement('script');
+				script.src = "/js/tour.js";
+				document.body.appendChild(script);
+			}
+		</script>
 		<!-- Google tag (gtag.js) -->
 		<script async src="https://www.googletagmanager.com/gtag/js?id=G-PFHQ43RCK8"></script>
 		<script>
@@ -19,13 +28,13 @@
 		</script>
     </head>
     <body>
-        <div class="main-container">
-            
-        </div>
+		<script src="/js/loader.js"></script>
+		<div class="back-container"></div>
 		<div id="sidenav" class="sidenav">
 			<a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
 			<a class="sidebar-link" href="/dashboard/profile">Profile</a>
 			<a class="sidebar-link" id="reg_dev_link" href="/dashboard/register_device">Register Device</a>
+			<a class="sidebar-link" href="/dashboard?showDemo=true">Show Demo</a>
 			<a class="sidebar-link" href="/logout">Logout</a>
 		</div>
 		<div class="centered-img">
@@ -49,7 +58,7 @@
 			</div>
 		</div>
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.umd.min.js"></script>
-        <script src="/js/dashboard.js"></script>
+		<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.umd.min.js"></script>
+		<script src="/js/dashboard.js"></script>
     </body>
 </html>
