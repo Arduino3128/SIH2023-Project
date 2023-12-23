@@ -1,29 +1,14 @@
 import asyncio
-import uvicorn
-from starlette.applications import Starlette
-from starlette.routing import Route
-from sse_starlette.sse import EventSourceResponse
-from sse_starlette.sse import ServerSentEvent
+import websockets
 
-async def numbers(minimum, maximum):
-	for i in range(minimum, maximum + 1):
-		yield dict(data=i)
-		await asyncio.sleep(2)
 
-async def sse(request):
-	generator = numbers(1, 10)
-	return EventSourceResponse(
-		generator,
-		headers={"Server": "nini"},
-		ping=5,
-		ping_message_factory=lambda: ServerSentEvent(**{"comment": "You can't see\r\nthis ping"}),
-	)
+async def handler(websocket, path):
+    data = await websocket.recv()
+    reply = f"Data recieved as:  {data}!"
+    await websocket.send(reply)
 
-routes = [
-	Route("/", endpoint=sse)
-]
 
-app = Starlette(debug=True, routes=routes)
+start_server = websockets.serve(handler, "0.0.0.0", 9000)
 
-if __name__ == "__main__":
-	uvicorn.run(app, host="0.0.0.0", port=9000, log_level='debug')
+asyncio.get_event_loop().run_until_complete(start_server)
+asyncio.get_event_loop().run_forever()

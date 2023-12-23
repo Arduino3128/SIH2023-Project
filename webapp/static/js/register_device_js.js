@@ -1,3 +1,29 @@
+let min_thresh = [[0.3, 0.3, 0.3], [0.4, 0.4, 0.4], [0.5, 0.5, 0.5]];
+let max_thresh = [[0.85, 0.85, 0.85], [0.8, 0.8, 0.8], [0.75, 0.75, 0.75]];
+let soil_type = 0, crop_type = 0;
+let crop_selector = document.getElementById('crop');
+let soil_selector = document.getElementById('soil');
+
+crop_selector.addEventListener('onchange', function() {
+	let c_type = crop_selector.value;
+	if(c_type == 'cotton')
+		crop_type = 0;
+	else if(c_type == 'wheat')
+		crop_type = 1;
+	else if(c_type == 'sugarcane')
+		crop_type = 2;
+});
+
+soil_selector.addEventListener('onchange', function() {
+	let s_type = soil_selector.value;
+	if(s_type == 'alluvial')
+		soil_type = 0;
+	else if(s_type == 'black')
+		soil_type = 1;
+	else if(s_type == 'red')
+		soil_type = 2;
+})
+
 function isUUID(uuid) {
   const uuidPattern = /^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i;
   return uuidPattern.test(uuid);
@@ -157,10 +183,24 @@ async function onScanSuccess(decodedText, decodedResult) {
 				data_resonse_status = data_response["status"];
 				if (data_resonse_status=="REGISTERED")
 					write_status("Soil Probe Module Registered!","#00FF00");
-				else if (data_resonse_status=="REREGISTERED")
-					write_status(`Soil Probe Module re-registered under farm: ${farm_id}<br>Location: ${dev_location}`,"#00FF00");
-				else
+				else if (data_resonse_status=="DEREGISTER"){
+					var deregister = window.confirm("Do you want to deregister the module?");
+					if (deregister){
+						_result = await deregister_device(farm_id, device_id);
+						if (_result){
+							write_status(`Soil Probe Module deregistered under farm: ${farm_id}<br>Location: ${dev_location}`,"#00FF00");
+						}
+						else{
+							write_status("Soil Probe Module deregistration Failed!","#FF0000");
+						}
+					}
+					else{
+						write_status("Soil Probe Module deregistration cancelled!","#FF0000");
+					}
+				}
+				else{
 					write_status("Soil Probe Module Registration Failed!","#FF0000");
+				}
 	        }
 	    }
 	}
@@ -178,16 +218,18 @@ async function onScanSuccess(decodedText, decodedResult) {
 
 function register_device(alias_name, farm_id, device_id, dev_location) {
   return new Promise(async (resolve, reject) => {
-    try {
+	try {
 		try {
 			html5QrCode.pause(shouldPauseVideo, showPausedBanner);
 		} catch (error) {
-			
+
 		}
 		document.getElementsByName("farm_id")[0].value = farm_id;
 		document.getElementsByName("device_id")[0].value = device_id;
 		document.getElementsByName("location")[0].value = dev_location;
 		document.getElementsByName("alias_name")[0].value = alias_name;
+		document.getElementsByName('min_thresh')[0].value = min_thresh[crop_type][soil_type];
+		document.getElementsByName('max_thresh')[0].value = max_thresh[crop_type][soil_type];
 		const formData = new FormData(document.getElementById('data_form'));
 		const formDataString = new URLSearchParams(formData).toString();
 		const response = await fetch('/dashboard/register_device', {
@@ -200,14 +242,43 @@ function register_device(alias_name, farm_id, device_id, dev_location) {
 		});
 
 
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
+	  if (!response.ok) {
+		throw new Error('Network response was not ok');
+	  }
 
-      const data = await response.json();
-      resolve(data); // Resolve the Promise with the response data
-    } catch (error) {
-      reject(error); // Reject the Promise with the error
-    }
+	  const data = await response.json();
+	  resolve(data); // Resolve the Promise with the response data
+	} catch (error) {
+	  reject(error); // Reject the Promise with the error
+	}
+  });
+}
+
+function deregister_device(farm_id, device_id ) {
+  return new Promise(async (resolve, reject) => {
+	try {
+		document.getElementsByName("farm_id")[0].value = farm_id;
+		document.getElementsByName("device_id")[0].value = device_id;
+		const formData = new FormData(document.getElementById('data_form'));
+		const formDataString = new URLSearchParams(formData).toString();
+		const response = await fetch('/dashboard/deregister_device', {
+		  headers: {
+			'Content-Type': 'application/x-www-form-urlencoded'
+		  },
+		credentials: 'include',
+		method: 'POST',
+		body: formDataString
+		});
+
+
+	  if (!response.ok) {
+		throw new Error('Network response was not ok');
+	  }
+
+	  const data = await response.json();
+	  resolve(data); // Resolve the Promise with the response data
+	} catch (error) {
+	  reject(error); // Reject the Promise with the error
+	}
   });
 }

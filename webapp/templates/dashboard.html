@@ -29,7 +29,7 @@
     </head>
     <body>
 		<script src="/js/loader.js"></script>
-		<div class="back-container"></div>
+		<!--div class="back-container"></div-->
 		<div id="sidenav" class="sidenav">
 			<a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
 			<a class="sidebar-link" href="/dashboard/profile">Profile</a>
@@ -56,6 +56,25 @@
 			<hr>
 			<div class="grid-container">
 			</div>
+		</div>
+		<div class="weather-container">
+		<table class="weather-table">
+			<tr>
+				<th></th>
+				<th>
+					<button onclick="weatherButton();" class="weather-button">»</button>
+				</th>	
+				<th></th>
+			</tr>
+			<tr>
+				<td id="temperature-scope"><p>Current Temp.: 0°C</p><br><p>Max. Temp.: 0°C<br>Min. Temp.: 0°C</p></td>
+			<td>
+				<img id="weather-image-scope" src="https://cdn.weatherapi.com/weather/64x64/day/113.png"/>
+			</td>
+				<td id="water-scope"><p>Rain: 0mm</p><br><p>Humidity: 0%</p></td>
+			</tr>
+			
+		</table>
 		</div>
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 		<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.umd.min.js"></script>

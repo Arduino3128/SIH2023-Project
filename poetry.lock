@@ -311,19 +311,6 @@ files = [
 ]
 
 [[package]]
-name = "paho-mqtt"
-version = "1.6.1"
-description = "MQTT version 5.0/3.1.1 client class"
-optional = false
-python-versions = "*"
-files = [
-    {file = "paho-mqtt-1.6.1.tar.gz", hash = "sha256:2a8291c81623aec00372b5a85558a372c747cbca8e9934dfe218638b8eefc26f"},
-]
-
-[package.extras]
-proxy = ["PySocks"]
-
-[[package]]
 name = "pillow"
 version = "10.1.0"
 description = "Python Imaging Library (Fork)"
@@ -797,4 +784,4 @@ email = ["email-validator"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10.0,<3.11"
-content-hash = "aba6512933744418955d911ae73273e41e728a14c4ccf395ddaf787be9756174"
+content-hash = "787ea4bff1a82e922253a052f0f5344eac441f0b5732c77fad382c66af025ff4"

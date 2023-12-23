@@ -128,7 +128,25 @@ class Database:
 			return True
 		return False
 
-	def reregister_device(self, username, device_id, location, alias_name, farm_id, _info):
+	def deregister_device(self, username, password, device_id, farm_id):
+		try:
+			_result = None
+			_info = self.get_device_info(device_id)
+			if _info['device']["type"]=="SoilProbeModule":
+				data = {"$unset": {f"UserAsset.{farm_id}.ProbeModule.{device_id}": 1}}
+				query = {"UserInfo.Username": username}
+				_result = self.collection.update_one(query, data)
+				self.device_collection.update_one(
+					{"device.id": device_id},
+					{"$set": {"device.registered": False,"device.registered_to": "N/A"}},
+				)
+				if _result.modified_count > 0:
+					return {"status": "DEREGISTERED"}
+			return {"status": "FAIL"}
+		except:
+			return {"status": "FAIL"}
+
+	def reregister_device(self, username, device_id, location, alias_name, farm_id, _info, max_thresh, min_thresh):
 		if _info['device']["type"]=="SoilProbeModule":
 			data = {"$unset": {f"UserAsset.{_info['device']['registered_to']}.ProbeModule.{device_id}": 1}}
 			query = {"UserInfo.Username": username}
@@ -144,7 +162,10 @@ class Database:
 							"Humidity": 0.0,
 							"Temperature": 0.0,
 							"SWI": 0.0,
+							"Prediction":0.0,
 						},
+						"MaxThresh":max_thresh,
+						"MinThresh":min_thresh,
 					}
 				}
 			}
@@ -165,8 +186,8 @@ class Database:
 				if _result.modified_count > 0:
 					return True
 		return False
-
-	def register_device(self, username, password, device_id, location, alias_name, farm_id=0):
+	
+	def register_device(self, username, password, device_id, location, alias_name, max_thresh=0, min_thresh=0, farm_id=0):
 		try:
 			_result = None
 			_info = self.get_device_info(device_id)
@@ -202,7 +223,10 @@ class Database:
 											"Humidity": 0.0,
 											"Temperature": 0.0,
 											"SWI": 0.0,
+											"Prediction":0.0,
 										},
+										"MaxThresh":max_thresh,
+										"MinThresh":min_thresh,
 									}
 								}
 							}
@@ -212,12 +236,11 @@ class Database:
 						if (self.check_asset(
 							username, device_id, _info["device"]["type"], _info
 						) and self.farm_exists(username, farm_id)):
-							if self.reregister_device(
-								username, device_id, location, alias_name, farm_id, _info
-							):
-								return {"status": "REREGISTERED"}
-							else:
-								return {"status": "FAIL"}
+							if _info["device"]["type"] == "SoilProbeModule":
+								return {"status":"DEREGISTER"}
+							elif _info["device"]["type"] == "ComputeModule":
+								if self.reregister_device(username, device_id, location, alias_name, farm_id, _info, max_thresh, min_thresh):
+									return {"status": "REREGISTERED"}
 						else:
 							return {"status": "NOTUSERFAIL"}
 
@@ -234,6 +257,7 @@ class Database:
 			return {"status": f"FAIL: {ERROR}"}
 
 	def verify_device_request(self, dev_id, token, totp):
+		return True
 		_dev_request = self.device_collection.find_one(
 			{"$and": [{"device.id": dev_id}, {"device.api_key": token}]}
 		)
@@ -251,7 +275,7 @@ class Database:
 
 	def api(self, dev_id, farm_id, value_type, token, totp, value):
 		try:
-			if self.verify_device_request(dev_id, token, totp):
+			if self.verify_device_request(farm_id, token, totp):
 				query = {}
 				data = {}
 				match value_type:
@@ -295,6 +319,15 @@ class Database:
 							return {value_type:True}
 						else:
 							return {value_type:False}
+							
+					case "GetAssets":
+						query = {
+							f"UserAsset.{farm_id}.ProbeModule": {"$exists": True}
+						}
+						_result = self.collection.find_one(query)
+						if _result:
+							return {value_type :_result["UserAsset"][farm_id]}
+
 					case other:
 						return {"Error":"Invalid Parameter"}
 			return {"Error":"Authentication Failure"}

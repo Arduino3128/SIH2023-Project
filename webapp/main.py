@@ -8,11 +8,13 @@ from flask_session import Session
 from flask_wtf.csrf import CSRFError, CSRFProtect
 from regex import Regex
 from werkzeug.middleware.proxy_fix import ProxyFix
+from flask_socketio import SocketIO, emit, join_room, leave_room
 
 # ------------- APP CONFIGS --------------------
 app_config = dotenv_values(".env")
 mongodb_url = app_config["MONGODB_URL"].format(app_config["MONGODB_USER"],
                                                app_config["MONGODB_PASS"])
+client_sessions = {}
 re = Regex()
 # -------------- DB CONFIGS ---------------------
 DB = Database()
@@ -37,6 +39,7 @@ app.config.update(
 #app.config['SERVER_NAME'] = "barelyafloat.cloudns.nz"
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_host=1)
 Session(app)
+socketio = SocketIO(app)
 
 
 # -------------- ERROR HANDLERS ---------------
@@ -197,21 +200,46 @@ def register_device():
                     alias_name = request.form.get("alias_name")
                     farm_id = request.form.get("farm_id")
                     location = request.form.get("location")
-                    _status = DB.register_device(
-                        session.get("Username"),
-                        session.get("Password"),
-                        device_id,
-                        location,
-                        alias_name,
-                        farm_id,
-                    )
+                    max_val = request.form.get("max_thresh")
+                    min_val = request.form.get("min_thresh")
+                    _status = DB.register_device(session.get("Username"),
+                                                 session.get("Password"),
+                                                 device_id, location,
+                                                 alias_name, max_val, min_val,
+                                                 farm_id)
+                    if _status["status"] == "REGISTERED":
+                        socketio.emit('message_from_server',
+                                      {'data': 'DEVICE CHANGED'},
+                                      room=farm_id)
                     return _status
                 except Exception as ERROR:
                     return {"status": f"FAIL: {ERROR}"}
             else:
                 farm_id = request.args.get("farm_id")
                 return render_template("register_device.html", farm_id=farm_id)
+    return redirect("/login")
 
+
+@app.route("/dashboard/deregister_device", methods=["GET", "POST"])
+def deregister_device():
+    if session.get("Username"):
+        if DB.verify_user(session.get("Username"), session.get("Password")):
+            if request.method == "POST":
+                try:
+                    device_id = request.form.get("device_id")
+                    farm_id = request.form.get("farm_id")
+                    _status = DB.deregister_device(session.get("Username"),
+                                                   session.get("Password"),
+                                                   device_id, farm_id)
+                    socketio.emit('message_from_server',
+                                  {'data': 'DEVICE CHANGED'},
+                                  room=farm_id)
+                    return _status
+                except Exception as ERROR:
+                    return {"status": f"FAIL: {ERROR}"}
+            else:
+                farm_id = request.args.get("farm_id")
+                return render_template("register_device.html", farm_id=farm_id)
     return redirect("/login")
 
 
@@ -247,10 +275,36 @@ def api():
     value = request.form.get("value")
     farm_id = request.form.get("farm_id")
     dev_id = request.form.get("dev_id")
+    print(value_type, token, totp, value, farm_id, dev_id)
     _status = {
         "response": DB.api(dev_id, farm_id, value_type, token, totp, value)
     }
     return _status
+
+
+#--------------- SOCKET THINGS ------------------
+@socketio.on('connect')
+def handle_connect():
+    print('Client connected')
+
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    print('Client disconnected')
+
+
+@socketio.on('join_room')
+def handle_join_room(data):
+    room = data['room']
+    join_room(room)
+    print(f'Client joined room: {room}')
+
+
+@socketio.on('leave_room')
+def handle_leave_room(data):
+    room = data['room']
+    leave_room(room)
+    print(f'Client left room: {room}')
 
 
 # -------------- WSGI INITIALIZER ---------------
@@ -259,7 +313,7 @@ def run():
         from waitress import serve
 
         print("⎆ Web Server started.")
-        serve(app, host="0.0.0.0", port=8000)
+        serve(app, host="0.0.0.0", port=8080)
     except Exception as error:
         print("⎈ Failed to start Web Server.")
         print(f"⎇ Debug: {error}")

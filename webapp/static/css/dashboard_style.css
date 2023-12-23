@@ -315,3 +315,46 @@ input:checked + .slider:before {
 	border-radius: 2px;
 	mix-blend-mode: difference;
 }
+
+.weather-container {
+	position: fixed;
+	left: 0;
+	right: 0;
+	bottom: -20%;
+	margin: 5%;
+	text-align: center;
+	background-color: rgba(255,255,255,0.5);
+	backdrop-filter: blur(10px);
+	height: 200px;
+	margin-bottom: 0px;
+	border-radius: 15px;
+	transition:0.5s all ease-in-out;
+}
+
+.weather-button {
+	transform: rotate(-90deg);
+	background-color: transparent;
+	border: 1px solid transparent;
+	font-size: 50px;
+	text-align: center;
+	transition: 0.5s all ease-in-out;
+	position: relative;
+	margin-top: -15px;
+}
+
+.weather-button:hover{
+	cursor:pointer;
+}
+
+.weather-table {
+	transition:0.5s all ease-in-out;
+	margin: auto;
+	width:100%;
+	/*font-size:small;*/
+	color: rgb(33, 100, 0);
+}
+
+.weather-table p{
+	transition:0.5s all ease-in-out;
+	margin-top:5px;
+}

@@ -1,13 +1,22 @@
 var probe_list={};
 var timer;
 var chart_list={};
+var weather_button_clicked = true;
 
 function createGauge(sensor_data, sensorId) {
+	var max_thresh = sensor_data[sensorId]["MaxThresh"]
+	var min_thresh = sensor_data[sensorId]["MinThresh"]
+  	var avg = (max_thresh + min_thresh) / 2;
 	var data = {
 		labels: ['Low', 'Moderate', 'Optimal', 'Moderate', 'High'],
 		datasets: [{
 			label: 'Soil moisture',
-			data: [20, 20, 20, 20, 20],
+      data: [min_thresh * 100, 
+         (max_thresh - min_thresh) * 10,
+         (max_thresh - min_thresh) * 80, 
+         (max_thresh - min_thresh) * 10,
+         (1 - max_thresh) * 90],
+      //data: [20, 20, 20, 20, 20],
 			backgroundColor: [
 				'rgba(255, 26, 104,1)',
 				'rgba(255, 206, 86,1)',
@@ -225,6 +234,7 @@ function createPopup(probe_list, sensorId, farmId) {
 	let temperature = probe_list[sensorId]["SensorData"]["Temperature"];
 	let humidity = probe_list[sensorId]["SensorData"]["Humidity"];
 	let valveState = probe_list[sensorId]["ValveState"];
+  let predicted = probe_list[sensorId]["SensorData"]["Prediction"];
 
 	const popup = document.createElement("div");
 	popup.className = "popup";
@@ -250,6 +260,10 @@ function createPopup(probe_list, sensorId, farmId) {
 	const l_humidity = document.createElement('p');
 	l_humidity.textContent = `Humidity: ${humidity}%`;
 	popup.appendChild(l_humidity);
+
+  const predict = document.createElement('p');
+  predict.textContent = `Predicted value: ${predicted*100}%`;
+  popup.appendChild(predict);
 
 	popup.appendChild(document.createElement('br'));
 
@@ -297,13 +311,12 @@ function createPopup(probe_list, sensorId, farmId) {
 }
 
 
-function createFarm(probe_list,farmId)
+async function createFarm(probe_list,farmId, farmLocation)
 {
 	clearInterval(timer);
 	document.getElementById("reg_dev_link").href = `/dashboard/register_device?farm_id=${farmId}`
 	const no_of_div = Object.keys(probe_list).length;
-	const gridContainer = document.querySelector(".grid-container");
-
+	const gridContainer = document.querySelector(".grid-container");	
 	for (let i = 0; i < no_of_div; i++) {
 		let sensorId = Object.keys(probe_list)[i];
 		const gaugeDiv = document.createElement("div");
@@ -319,6 +332,11 @@ function createFarm(probe_list,farmId)
 	}
 	update_probes(farmId);
 	document.getElementsByClassName("last-update")[0].innerHTML = `Last Updated: ${(new Date().toLocaleString()).toUpperCase()}`;
+	var weather_info = await get_weather(farmLocation);
+	document.getElementById("temperature-scope").innerHTML = `<p>Current Temp.: ${weather_info['current']['temp_c']}°C</p><br><p>Max. Temp.:  ${weather_info['forecast']['forecastday'][0]['day']['maxtemp_c']}°C<br>Min. Temp.:  ${weather_info['forecast']['forecastday'][0]['day']['mintemp_c']}°C</p>`;
+	document.getElementById("weather-image-scope").src = `https:${weather_info['current']['condition']['icon']}`
+	document.getElementById("water-scope").innerHTML = `<p>Rain: ${weather_info['current']['precip_mm']}mm</p><br><p>Humidity: ${weather_info['current']['humidity']}%</p>`
+	
 }
 
 function get_farm(alias_name, farm_id, device_id, dev_location) {
@@ -337,7 +355,26 @@ function get_farm(alias_name, farm_id, device_id, dev_location) {
 		method: 'POST',
 		body: formDataString
 		});
-		
+
+	  if (!response.ok) {
+		throw new Error('Network response was not ok');
+	  }
+
+	  const data = await response.json();
+	  resolve(data); // Resolve the Promise with the response data
+	} catch (error) {
+	  reject(error); // Reject the Promise with the error
+	}
+  });
+}
+
+function get_weather(farmLocation) {
+  return new Promise(async (resolve, reject) => {
+	try {
+		const response = await fetch(`https://api.weatherapi.com/v1/forecast.json?key=84bd2a1f37d74e588c455528231309&q=${farmLocation}&days=1&aqi=no&alerts=no`, {
+		method: 'GET',
+		});
+
 	  if (!response.ok) {
 		throw new Error('Network response was not ok');
 	  }
@@ -357,7 +394,7 @@ farm.addEventListener("change", async function () {
 	document.getElementsByClassName("last-update")[0].innerHTML = `Fetching Probes...`;
 	clear_gauges();
 	probe_list = await get_probes(farm_id);
-	createFarm(probe_list, farm_id);
+	createFarm(probe_list, farm_id, farm.location);
 });
 
 async function main(){
@@ -366,17 +403,24 @@ async function main(){
 		var option = document.createElement("option");
 		option.text = farm[value]["AliasName"];
 		option.value = value;
+		option.location = farm[value]["Location"]
 		x.add(option);   
 	}
 	var farm = await get_farm();
 	farm_list = farm;
 	farm_list = Object.keys(farm_list);
 	farm_list.forEach(list_farm)
+	try {
+		farm_location = farm[farm_list[0]]["Location"]
+	} catch (error) {
+		
+	}
+	
 	if (farm_list.length){
 		document.querySelector(".farm-name").textContent = farm[farm_list[0]]["AliasName"];
 		probe_list = await get_probes(farm_list[0]);
 		document.getElementById("farm").style.display = "block";
-		createFarm(probe_list,farm_list[0]);
+		createFarm(probe_list,farm_list[0], farm_location);
 	}
 	else{
 		document.querySelector(".farm-name").textContent = "Add Farm by Scanning the Code.";
@@ -384,9 +428,6 @@ async function main(){
 		document.getElementById("farm").style.display = "none";
 	}
 }
-
-main();
-
 
 function openNav() {
   document.getElementById("sidenav").style.width = "250px";
@@ -396,3 +437,18 @@ function openNav() {
 function closeNav() {
   document.getElementById("sidenav").style.width = "0";
 } 
+
+function weatherButton(){
+	if (!weather_button_clicked){
+		document.getElementsByClassName("weather-button")[0].style.transform="rotate(-90deg)";
+		document.getElementsByClassName("weather-container")[0].style.bottom="-20%"
+		weather_button_clicked = true;
+	}
+	else{
+		document.getElementsByClassName("weather-button")[0].style.transform="rotate(90deg)";
+		document.getElementsByClassName("weather-container")[0].style.bottom="-15px"
+		weather_button_clicked = false;
+	}
+}
+
+main();
